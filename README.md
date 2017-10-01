@@ -1,5 +1,6 @@
 # 佈局津梁
 
-Link http://www.smallworld.idv.tw/cch/cch2.html
+* HTML5互動式象棋譜
+* Link http://www.smallworld.idv.tw/cch/cch2.html
 
 ![image](cch.png)
