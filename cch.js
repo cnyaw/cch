@@ -236,7 +236,6 @@ function onCanvasMouseDown(e) {
   if (mov1 < movCur &&
       ptInRect(x, y, 0, offsety + 3.5 * CH, 2 * CW, 3 * CH)) {
     moveGame(movCur - 1);
-    e.preventDefault();
   }
 
   //
@@ -246,8 +245,9 @@ function onCanvasMouseDown(e) {
   if (movCur < movRec.length &&
       ptInRect(x, y, offsetx + BW * CW - CW, offsety + 3.5 * CH, 2 * CW, 3 * CH)) {
     moveGame(movCur + 1);
-    e.preventDefault();
   }
+
+  e.preventDefault();
 }
 
 function isMoveRecords(s) {
