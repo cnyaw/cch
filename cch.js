@@ -274,13 +274,18 @@ function getMoveRecords(s, p) {
         if (null == v) {
           continue;
         }
+        var found = false;
         for (var i = 0; i < v.length; i++) {
           if (-1 != v[i].indexOf(no)) {
             var rec = s.substring(s.indexOf(')') + 1, s.indexOf(v[i])).trim().split(' ');
             movRec = rec.slice(0, rec.length - 1).concat(movRec);
             mov1 = mov1 + rec.length - 1;
-            return;                     // Found.
+            found = true;
+            break;
           }
+        }
+        if (found) {
+          break;
         }
       }
     }
