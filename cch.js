@@ -17,6 +17,7 @@ var ctx2d;
 var movRec;                             // History of moves.
 var mov1, movCur;                       // First move, current move.
 var bd;                                 // Game board.
+var selp, selm;
 
 function initGame() {
 
@@ -100,6 +101,20 @@ function isRed(idx) {
 var sNum1 = '一二三四五六七八九', sNum2 = '九八七六五四三二一';
 var sType1 = '士象卒馬炮車將', sType2 = '士相兵馬炮車帥';
 var sMov1 = '士象馬', sMov2 = '士相馬';
+
+function isMove(s) {
+  var m = s.split('');
+  if (-1 != sType1.indexOf(m[0])) {
+    return true;
+  }
+  if (-1 != sType2.indexOf(m[0])) {
+    return true;
+  }
+  if (-1 != '前後'.indexOf(m[0])) {
+    return true;
+  }
+  return false;
+}
 
 function movePiece(idx) {
   var m = movRec[idx].split('');        // Split a move, ex: ['炮','二','平','五'].
@@ -193,6 +208,33 @@ function moveGame(c) {
     }
   }
   drawGame();
+
+  //
+  // Highlight current move.
+  //
+
+  if (selm) {
+    selm.style.color = '';
+    selm.style.backgroundColor = '';
+  }
+
+  if (selp) {
+    var idx = mov1;
+    for (var i = 1; i < selp.childNodes.length; i++) {
+      var n = selp.childNodes[i];
+      var s = n.innerText || n.textContent;
+      if (!isMove(s.trim())) {
+        continue;
+      }
+      idx += 1;
+      if (idx == c) {
+        n.style.color = 'white';
+        n.style.backgroundColor = 'red';
+        selm = n;
+        break;
+      }
+    }
+  }
 }
 
 function ptInRect(x, y, left, top, width, height) {
@@ -344,6 +386,42 @@ document.onclick = function(e) {
   //
 
   getMoveRecords(s, p);
+
+  if (selm) {
+    selm.style.color = '';
+    selm.style.backgroundColor = '';
+  }
+  selp = p;
+
+  //
+  // Split and convert text and bold texts to elements.
+  //
+
+  for (var i = p.childNodes.length - 1; 0 <= i; i--) {
+    var n = p.childNodes[i];
+    if (3 == n.nodeType) {              // Text.
+      var s = n.innerText || n.textContent;
+      var m = s.trim().split(' ');
+      for (var j = 0; j < m.length; j++) {
+        var style = document.createElement('span');
+        style.innerHTML = ' ' + m[j] + ' ';
+        p.insertBefore(style, n);
+      }
+      p.removeChild(n);
+    } else if ('b' == n.tagName.toLowerCase()) {
+      var s = n.innerText || n.textContent;
+      var m = s.trim().split(' ');
+      if (1 == m) {
+        continue;
+      }
+      for (var j = 0; j < m.length; j++) {
+        var style = document.createElement('b');
+        style.innerHTML = ' ' + m[j] + ' ';
+        p.insertBefore(style, n);
+      }
+      p.removeChild(n);
+    }
+  }
 
   //
   // Display game board.
