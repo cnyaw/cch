@@ -18,6 +18,7 @@ var movRec;                             // History of moves.
 var mov1, movCur;                       // First move, current move.
 var bd;                                 // Game board.
 var selp, selm;
+var movFrom, movTo;
 
 function initGame() {
 
@@ -46,6 +47,7 @@ function drawGame() {
   // Erase bkgnd.
   //
 
+  ctx2d.strokeStyle = 'black';
   ctx2d.fillStyle = 'white';
   ctx2d.fillRect(0, 0, SW, SH);
 
@@ -91,6 +93,23 @@ function drawGame() {
   }
   if (movCur < movRec.length) {
     ctx2d.drawImage(imgArrow, CW, 0, CW, CH, offsetx + BW * CW, offsety + 4.5 * CH, CW, CH); // Right.
+  }
+
+  //
+  // Draw move from/to rect.
+  //
+
+  if (null != movFrom) {
+    var col = movFrom % BW, row = Math.floor(movFrom / BW);
+    ctx2d.strokeStyle = 'red';
+    var d = 4;
+    ctx2d.strokeRect(offsetx + col * CW + d, offsety + row * CH + d, CW - 2 * d, CH - 2 * d);
+  }
+
+  if (null != movTo) {
+    var col = movTo % BW, row = Math.floor(movTo / BW);
+    ctx2d.strokeStyle = 'red';
+    ctx2d.strokeRect(offsetx + col * CW, offsety + row * CH, CW, CH);
   }
 }
 
@@ -175,9 +194,11 @@ function movePiece(idx) {
 
   var colDest = (red ? sNum2 : sNum1).indexOf(m[3]);
 
+  movFrom = pLoc;
   if ('平' == m[2]) {
     bd[pLoc] = 0;
-    bd[pLoc - pCol + colDest] = pType;
+    movTo = pLoc - pCol + colDest;
+    bd[movTo] = pType;
   } else if ('進' == m[2] || '退' == m[2]) {
     var sign = '進' == m[2] ? -1 : 1;
     if (!red) {
@@ -187,10 +208,12 @@ function movePiece(idx) {
     if (-1 != sp) {
       var delta = [2, 4, 3];            // w + h.
       bd[pLoc] = 0;
-      bd[pLoc - pCol + colDest + sign * (delta[sp] - Math.abs(pCol - colDest)) * BW] = pType;
+      movTo = pLoc - pCol + colDest + sign * (delta[sp] - Math.abs(pCol - colDest)) * BW;
+      bd[movTo] = pType;
     } else {
       bd[pLoc] = 0;
-      bd[pLoc + sign * (1 + sNum1.indexOf(m[3])) * BW] = pType;
+      movTo = pLoc + sign * (1 + sNum1.indexOf(m[3])) * BW;
+      bd[movTo] = pType;
     }
   } else {
     return false;
@@ -392,6 +415,8 @@ document.onclick = function(e) {
     selm.style.backgroundColor = '';
   }
   selp = p;
+
+  movFrom = movTo = null;
 
   //
   // Split and convert text and bold texts to elements.
