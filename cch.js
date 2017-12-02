@@ -357,6 +357,32 @@ function getMoveRecords(s, p) {
   }
 }
 
+function splitMovRec(p, n, m, etype) {
+  for (var j = 0; j < m.length; j++) {
+    var style = document.createElement(etype);
+    style.innerHTML = ' ' + m[j] + ' ';
+    p.insertBefore(style, n);
+  }
+  p.removeChild(n);
+}
+
+function transMovRec(p) {
+  for (var i = p.childNodes.length - 1; 0 <= i; i--) {
+    var n = p.childNodes[i];
+    if (3 == n.nodeType) {              // Text.
+      var s = n.innerText || n.textContent;
+      var m = s.trim().split(' ');
+      splitMovRec(p, n, m, 'span');
+    } else if ('b' == n.tagName.toLowerCase()) {
+      var s = n.innerText || n.textContent;
+      var m = s.trim().split(' ');
+      if (1 != m) {
+        splitMovRec(p, n, m, 'b');
+      }
+    }
+  }
+}
+
 document.onclick = function(e) {
 
   //
@@ -422,31 +448,7 @@ document.onclick = function(e) {
   // Split and convert text and bold texts to elements.
   //
 
-  for (var i = p.childNodes.length - 1; 0 <= i; i--) {
-    var n = p.childNodes[i];
-    if (3 == n.nodeType) {              // Text.
-      var s = n.innerText || n.textContent;
-      var m = s.trim().split(' ');
-      for (var j = 0; j < m.length; j++) {
-        var style = document.createElement('span');
-        style.innerHTML = ' ' + m[j] + ' ';
-        p.insertBefore(style, n);
-      }
-      p.removeChild(n);
-    } else if ('b' == n.tagName.toLowerCase()) {
-      var s = n.innerText || n.textContent;
-      var m = s.trim().split(' ');
-      if (1 == m) {
-        continue;
-      }
-      for (var j = 0; j < m.length; j++) {
-        var style = document.createElement('b');
-        style.innerHTML = ' ' + m[j] + ' ';
-        p.insertBefore(style, n);
-      }
-      p.removeChild(n);
-    }
-  }
+  transMovRec(p);
 
   //
   // Display game board.
