@@ -319,6 +319,14 @@ function isMoveRecords(s) {
   return /^\((本\)|(二|三|四|五)變接)/.test(s);
 }
 
+function removeNotMove() {
+  for (var i = movRec.length - 1; 0 <= i; i--) {
+    if (!isMove(movRec[i])) {
+      movRec.splice(i, 1);
+    }
+  }
+}
+
 function getMoveRecords(s, p) {
   mov1 = 0;
   movRec = s.substring(s.indexOf(')') + 1, s.lastIndexOf('(')).trim().split(' ');
@@ -355,6 +363,8 @@ function getMoveRecords(s, p) {
       }
     }
   }
+
+  removeNotMove();
 }
 
 function splitMovRec(p, n, m, etype) {
