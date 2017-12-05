@@ -370,7 +370,7 @@ function getMoveRecords(s, p) {
 function splitMovRec(p, n, m, etype) {
   for (var j = 0; j < m.length; j++) {
     var style = document.createElement(etype);
-    style.innerHTML = ' ' + m[j] + ' ';
+    style.innerHTML = ' ' + m[j];
     p.insertBefore(style, n);
   }
   p.removeChild(n);
