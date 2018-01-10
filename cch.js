@@ -468,3 +468,48 @@ document.onclick = function(e) {
 
   moveGame(mov1);
 }
+
+function genMenuDiv(body) {
+  var menu = document.createElement('div');
+  var a = document.createElement('a');
+  a.name = 'menu';
+  menu.appendChild(a);
+  var h1 = body.getElementsByTagName('h1')[0];
+  body.insertBefore(menu, h1.nextSibling);
+  return menu;
+}
+
+function addMenuItem(menu, html, href) {
+  var a = document.createElement('a');
+  a.innerHTML = html;
+  a.href = href;
+  menu.appendChild(a);
+  menu.appendChild(document.createElement('br'));
+}
+
+function addAnchor(parent, name, child) {
+  var a = document.createElement('a');
+  a.name = name;
+  a.href = '#menu';
+  parent.insertBefore(a, child);
+  a.appendChild(child);
+}
+
+window.onload = function() {
+  var body = document.getElementsByTagName('body')[0];
+  var menu = genMenuDiv(body);
+  var i = 0;
+  var n = menu.nextSibling;
+  while (n) {
+    var nextn = n.nextSibling;
+    if (1 == n.nodeType) {
+      var tag = n.tagName.toLowerCase();
+      if ('h2' == tag || 'h3' == tag || 'h4' == tag) {
+        addMenuItem(menu, n.innerHTML, '#lnk' + i);
+        addAnchor(body, 'lnk' + i, n);
+        i += 1;
+      }
+    }
+    n = nextn;
+  }
+}
