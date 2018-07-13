@@ -19,6 +19,7 @@ var mov1, movCur;                       // First move, current move.
 var bd;                                 // Game board.
 var selp, selm;
 var movFrom, movTo;
+var comment;
 
 function initGame() {
 
@@ -289,6 +290,39 @@ function getOffset(e)
   return offset;
 }
 
+function getCurMovComment() {
+  if (null == selm) {
+    return '';
+  }
+
+  var ns = selm.nextSibling;
+  if (1 != ns.nodeType || 'sub' != ns.tagName.toLowerCase()) {
+    return '';
+  }
+
+  var tag = ns.innerText + '、';
+
+  var p = selp.nextElementSibling;
+  while (p) {
+    var s = p.innerText;
+    if (!s.startsWith('註釋')) {
+      break;
+    }
+    var si = s.indexOf(tag);
+    if (-1 != si) {
+      var ei = s.indexOf('、', si + tag.length);
+      if (-1 != ei) {
+        return s.substring(si + tag.length, s.lastIndexOf('。', ei) + 1);
+      } else {
+        return s.substring(si + tag.length);
+      }
+    }
+    p = p.nextElementSibling;
+  }
+
+  return '';
+}
+
 function onCanvasMouseDown(e) {
 
   var off = getOffset(e);
@@ -311,6 +345,13 @@ function onCanvasMouseDown(e) {
       ptInRect(x, y, offsetx + BW * CW - CW, offsety + 3.5 * CH, 2 * CW, 3 * CH)) {
     moveGame(movCur + 1);
   }
+
+  //
+  // Update comment.
+  //
+
+  var s = 0 < movCur ? (1 + Math.floor((movCur - 1) / 2)).toString() + '、' : '';
+  comment.innerHTML = s + getCurMovComment();
 
   e.preventDefault();
 }
@@ -437,6 +478,11 @@ document.onclick = function(e) {
   c.setAttribute('height', SH);
   c.onmousedown = onCanvasMouseDown;
   divBoard.appendChild(c);
+
+  comment = document.createElement('P');
+  var t = document.createTextNode('comment');
+  comment.appendChild(t);
+  divBoard.appendChild(comment);
 
   p.appendChild(divBoard);
 
