@@ -259,6 +259,13 @@ function moveGame(c) {
       }
     }
   }
+
+  //
+  // Update comment.
+  //
+
+  var s = 0 < movCur ? (1 + Math.floor((movCur - 1) / 2)).toString() + '、' : '';
+  comment.innerHTML = s + getCurMovComment();
 }
 
 function ptInRect(x, y, left, top, width, height) {
@@ -345,13 +352,6 @@ function onCanvasMouseDown(e) {
       ptInRect(x, y, offsetx + BW * CW - CW, offsety + 3.5 * CH, 2 * CW, 3 * CH)) {
     moveGame(movCur + 1);
   }
-
-  //
-  // Update comment.
-  //
-
-  var s = 0 < movCur ? (1 + Math.floor((movCur - 1) / 2)).toString() + '、' : '';
-  comment.innerHTML = s + getCurMovComment();
 
   e.preventDefault();
 }
@@ -441,10 +441,12 @@ document.onclick = function(e) {
   //
 
   var p = null;
+  var m = null;
   if (e.target instanceof HTMLParagraphElement) {
     p = e.target;
   } else if (e.target.parentNode instanceof HTMLParagraphElement) {
     p = e.target.parentNode;
+    m = e.target;
   } else {
     return;
   }
@@ -507,12 +509,30 @@ document.onclick = function(e) {
   transMovRec(p);
 
   //
+  // Move to select move.
+  //
+
+  var startMov = mov1;
+  if (null != m && 'span' == m.tagName.toLowerCase()) {
+    for (var i = 1; i < p.childNodes.length; i++) {
+      var n = p.childNodes[i];
+      if (n === m) {
+        var s = n.innerText || n.textContent;
+        if (isMove(s.trim())) {
+          startMov += i;
+        }
+        break;
+      }
+    }
+  }
+
+  //
   // Display game board.
   //
 
   ctx2d = c.getContext("2d");
 
-  moveGame(mov1);
+  moveGame(startMov);
 }
 
 function genMenuDiv(body) {
