@@ -517,11 +517,11 @@ document.onclick = function(e) {
   if (null != m && 'span' == m.tagName.toLowerCase()) {
     for (var i = 1; i < p.childNodes.length; i++) {
       var n = p.childNodes[i];
+      var s = n.innerText || n.textContent;
+      if (isMove(s.trim())) {
+        startMov += 1;
+      }
       if (n === m) {
-        var s = n.innerText || n.textContent;
-        if (isMove(s.trim())) {
-          startMov += i;
-        }
         break;
       }
     }
