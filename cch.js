@@ -308,6 +308,7 @@ function getCurMovComment() {
   }
 
   var tag = ns.innerText + '、';
+  var nexti = parseInt(ns.innerText) + 1;
 
   var p = selp.nextElementSibling;
   while (p) {
@@ -317,7 +318,7 @@ function getCurMovComment() {
     }
     var si = s.indexOf(tag);
     if (-1 != si) {
-      var ei = s.indexOf('、', si + tag.length);
+      var ei = s.indexOf(nexti + '、', si + tag.length);
       if (-1 != ei) {
         return s.substring(si + tag.length, s.lastIndexOf('。', ei) + 1);
       } else {
