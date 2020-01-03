@@ -265,7 +265,8 @@ function moveGame(c) {
   //
 
   var s = 0 < movCur ? (1 + Math.floor((movCur - 1) / 2)).toString() + '、' : '';
-  comment.innerHTML = s + getCurMovComment();
+  var m = null == selm ? '' : selm.innerHTML.trim() + '：';
+  comment.innerHTML = s + m + getCurMovComment();
 }
 
 function ptInRect(x, y, left, top, width, height) {
@@ -276,8 +277,7 @@ function ptInRect(x, y, left, top, width, height) {
   }
 }
 
-function getOffset(e)
-{
+function getOffset(e) {
   if (e.offsetX) {
     return {x:e.offsetX, y:e.offsetY};
   }
