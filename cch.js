@@ -562,6 +562,20 @@ function addAnchor(parent, name, child) {
   a.appendChild(child);
 }
 
+function showFirstGameBoard(n) {
+  while (n) {
+    var nextn = n.nextSibling;
+    if (1 == n.nodeType) {              // An element.
+      var tag = n.tagName.toLowerCase();
+      if ('p' == tag && 0 <= n.innerHTML.indexOf('<b>(本)</b>')) {
+        n.click();
+        return;
+      }
+    }
+    n = nextn;
+  }
+}
+
 window.onload = function() {
   var body = document.getElementsByTagName('body')[0];
   var menu = genMenuDiv(body);
@@ -569,7 +583,7 @@ window.onload = function() {
   var n = menu.nextSibling;
   while (n) {
     var nextn = n.nextSibling;
-    if (1 == n.nodeType) {
+    if (1 == n.nodeType) {              // An element.
       var tag = n.tagName.toLowerCase();
       if ('h2' == tag || 'h3' == tag || 'h4' == tag) {
         addMenuItem(menu, n.innerHTML, '#lnk' + i);
@@ -579,4 +593,5 @@ window.onload = function() {
     }
     n = nextn;
   }
+  showFirstGameBoard(body.getElementsByTagName('h1')[0]);
 }
