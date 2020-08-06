@@ -118,9 +118,9 @@ function isRed(idx) {
   return 0 == (idx % 2);
 }
 
-var sNum1 = '一二三四五六七八九', sNum2 = '九八七六五四三二一';
-var sType1 = '士象卒馬炮車將', sType2 = '士相兵馬炮車帥';
-var sMov1 = '士象馬', sMov2 = '士相馬';
+var sNum1 = '123456789', sNum2 = '九八七六五四三二一', sNumOfs = '一二三四五六七八九';
+var sType1 = '士象卒馬包車將', sType2 = '仕相兵傌炮俥帥';
+var sMov1 = '士象馬', sMov2 = '仕相傌';
 
 function isMove(s) {
   var m = s.split('');
@@ -213,7 +213,7 @@ function movePiece(idx) {
       bd[movTo] = pType;
     } else {
       bd[pLoc] = 0;
-      movTo = pLoc + sign * (1 + sNum1.indexOf(m[3])) * BW;
+      movTo = pLoc + sign * (1 + (red ? sNumOfs : sNum1).indexOf(m[3])) * BW;
       bd[movTo] = pType;
     }
   } else {
@@ -246,7 +246,7 @@ function moveGame(c) {
     var idx = mov1;
     for (var i = 1; i < selp.childNodes.length; i++) {
       var n = selp.childNodes[i];
-      var s = n.innerText || n.textContent;
+      var s = getElementText(n);
       if (!isMove(s.trim())) {
         continue;
       }
@@ -307,12 +307,12 @@ function getCurMovComment() {
     return '';
   }
 
-  var tag = ns.innerText + '、';
-  var nexti = parseInt(ns.innerText) + 1;
+  var tag = getElementText(ns) + '、';
+  var nexti = parseInt(getElementText(ns)) + 1;
 
   var p = selp.nextElementSibling;
   while (p) {
-    var s = p.innerText;
+    var s = getElementText(p);
     if (!s.startsWith('註釋')) {
       break;
     }
@@ -331,6 +331,10 @@ function getCurMovComment() {
   return '';
 }
 
+function getElementText(el) {
+  return el.innerText || el.textContent;
+}
+
 function onCanvasMouseDown(e) {
 
   var off = getOffset(e);
@@ -340,8 +344,7 @@ function onCanvasMouseDown(e) {
   // Prev move.
   //
 
-  if (mov1 < movCur &&
-      ptInRect(x, y, 0, offsety + 3.5 * CH, 2 * CW, 3 * CH)) {
+  if (mov1 < movCur && ptInRect(x, y, 0, offsety + 3.5 * CH, 2 * CW, 3 * CH)) {
     moveGame(movCur - 1);
   }
 
@@ -365,6 +368,9 @@ function removeNotMove() {
   for (var i = movRec.length - 1; 0 <= i; i--) {
     if (!isMove(movRec[i])) {
       movRec.splice(i, 1);
+      if (i < mov1) {
+        mov1 -= 1;
+      }
     }
   }
 }
@@ -383,7 +389,7 @@ function getMoveRecords(s, p) {
 
     while (true) {
       p = p.previousElementSibling;
-      s = p.innerText || p.textContent;
+      s = getElementText(p);
       if (p instanceof HTMLParagraphElement && isMoveRecords(s)) {
         var v = s.match(/變([二|三|四|五]‧?)+/g);
         if (null == v) {
@@ -413,6 +419,9 @@ function splitMovRec(p, n, m, etype) {
   for (var j = 0; j < m.length; j++) {
     var style = document.createElement(etype);
     style.innerHTML = ' ' + m[j];
+    if (-1 != m[j].indexOf('變') && -1 == m[j].indexOf('(')) {
+      style.style.textDecoration = 'underline';
+    }
     p.insertBefore(style, n);
   }
   p.removeChild(n);
@@ -422,11 +431,11 @@ function transMovRec(p) {
   for (var i = p.childNodes.length - 1; 0 <= i; i--) {
     var n = p.childNodes[i];
     if (3 == n.nodeType) {              // Text.
-      var s = n.innerText || n.textContent;
+      var s = getElementText(n);
       var m = s.trim().split(' ');
       splitMovRec(p, n, m, 'span');
     } else if ('b' == n.tagName.toLowerCase()) {
-      var s = n.innerText || n.textContent;
+      var s = getElementText(n);
       var m = s.trim().split(' ');
       if (1 != m) {
         splitMovRec(p, n, m, 'b');
@@ -456,7 +465,7 @@ document.onclick = function(e) {
   // Check is this a move records.
   //
 
-  var s = p.innerText || p.textContent;
+  var s = getElementText(p);
   if (!isMoveRecords(s)) {
     return;
   }
@@ -513,15 +522,16 @@ document.onclick = function(e) {
   // Move to select move.
   //
 
+  var tag = null != m ? m.tagName.toLowerCase() : '';
   var startMov = mov1;
-  if (null != m && 'span' == m.tagName.toLowerCase()) {
+  if (null != m && ('span' == tag || 'b' == tag)) {
     for (var i = 1; i < p.childNodes.length; i++) {
       var n = p.childNodes[i];
-      var s = n.innerText || n.textContent;
+      var s = getElementText(n);
       if (isMove(s.trim())) {
         startMov += 1;
       }
-      if (n === m) {
+      if (n.innerHTML === m.innerHTML) {
         break;
       }
     }
